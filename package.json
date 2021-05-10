@@ -1,0 +1,22 @@
+{
+  "name": "code-analysis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "template-server": "http-server site-template"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iainjmitchell/code-analysis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iainjmitchell/code-analysis/issues"
+  },
+  "homepage": "https://github.com/iainjmitchell/code-analysis#readme",
+  "dependencies": {
+    "http-server": "^0.12.3"
+  }
+}
