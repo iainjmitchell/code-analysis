@@ -43,9 +43,12 @@ function churn_analysis() {
 function hotspots_analysis() {
     echo 'hotspot analysis'
     revisions_file='revisions.csv'
-    docker container run -v $(pwd)/$CODE_DIR:/$CODE_DIR --rm philipssoftware/code-maat -l /$CODE_DIR/$GIT_LOG -c git2 -a revisions > ./$CODE_DIR/$revisions_file
-    echo 'python ./scripts/csv_as_enclosure_json.py --structure ../$CODE_DIR/$CLOC_LOG --weights ../$CODE_DIR/$revisions_file > $codebaseFolder/data/hotspots.json'
-    python ./scripts/csv_as_enclosure_json.py --structure $CODE_DIR/$CLOC_LOG --weights $CODE_DIR/$revisions_file > $codebaseFolder/data/hotspots.json
+    hotspot_git_log='hotspot-git.log'
+    cd $CODE_DIR
+    git log --pretty=format:'[%h] %an %ad %s' --date=short --numstat > $hotspot_git_log
+    cd ..
+    docker container run -v $(pwd)/$CODE_DIR:/$CODE_DIR --rm philipssoftware/code-maat -l /$CODE_DIR/$hotspot_git_log -c git -a revisions > ./$CODE_DIR/$revisions_file
+    python ./scripts/merge_comp_freqs.py $CODE_DIR/$revisions_file $CODE_DIR/$CLOC_LOG > $codebaseFolder/data/hotspots.json
 }
 
 function generate_git_log(){
@@ -55,7 +58,9 @@ function generate_git_log(){
 }
 
 function count_lines_of_code() {
-    docker run --rm -v $(pwd)/$CODE_DIR:/tmp aldanial/cloc /tmp/. --by-file --csv --report-file=$CLOC_LOG
+    docker run --rm -v $(pwd)/$CODE_DIR:/$CODE_DIR aldanial/cloc /$CODE_DIR --by-file --csv --report-file=/$CODE_DIR/$CLOC_LOG
+    remove_code_directory_from_path='s/\/code\///g'
+    sed -i '' $remove_code_directory_from_path ./$CODE_DIR/$CLOC_LOG
 }
 
 function start_server(){
