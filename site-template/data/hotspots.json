@@ -1,0 +1,7 @@
+{
+    "name": "src",
+    "children": [
+        {"size": "1341", "name": "file1.js", "weight": 0.10 },
+        {"size": "100", "name": "file2.js", "weight": 0.90 }
+    ]
+}
