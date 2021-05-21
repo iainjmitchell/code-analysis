@@ -13,7 +13,7 @@ function start() {
     generate_git_log
     count_lines_of_code
     analyse_code 
-    # start_server
+    start_server
 }
 
 function get_code() {
@@ -48,7 +48,7 @@ function hotspots_analysis() {
     git log --pretty=format:'[%h] %an %ad %s' --date=short --numstat > $hotspot_git_log
     cd ..
     docker container run -v $(pwd)/$CODE_DIR:/$CODE_DIR --rm philipssoftware/code-maat -l /$CODE_DIR/$hotspot_git_log -c git -a revisions > ./$CODE_DIR/$revisions_file
-    python ./scripts/merge_comp_freqs.py $CODE_DIR/$revisions_file $CODE_DIR/$CLOC_LOG > $codebaseFolder/data/hotspots.json
+    python ./scripts/merge_comp_freqs.py $CODE_DIR/$revisions_file $CODE_DIR/$CLOC_LOG | node ./scripts/transformHotspotsToD3.js > $codebaseFolder/data/hotspots.json
 }
 
 function generate_git_log(){
