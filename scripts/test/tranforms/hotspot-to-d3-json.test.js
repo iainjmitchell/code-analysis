@@ -20,20 +20,26 @@ testCases.forEach((testCase) => {
     });
 });
 
-// test('converted two records with equal split of weight', async() => {
-//     const records = [
-//         { module: 'file1.js', revisions: 50, code: 100 },
-//         { module: 'file2.js', revisions: 50, code: 200 },
-//     ]
+test('converted two root records with equal split of weight', async() => {
+    const records = [
+        { module: 'file1.js', revisions: 50, code: 100 },
+        { module: 'file2.js', revisions: 50, code: 200 },
+    ]
     
-//     const hotspotCSVData = [
-//         'module,revisions,code',
-//         `${record[0].module},${record[0].revisions},${record[0].code}`,
-//         `${record[1].module},${record[1].revisions},${record[1].code}`
-//     ].join(EOL);
+    const hotspotCSVData = [
+        'module,revisions,code',
+        `${record[0].module},${record[0].revisions},${record[0].code}`,
+        `${record[1].module},${record[1].revisions},${record[1].code}`
+    ].join(EOL);
 
-//     await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({"size": testCase.code, "name": testCase.module, "weight": 1});
-// });
+    await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({
+        "name": ".",
+        "children": [
+            {"size": record[0].code, "name": record[0].module, "weight": 0.5},
+            {"size": record[1].code, "name": record[1].module, "weight": 0.5}
+        ]
+    });
+});
 
 const parseString = require('@fast-csv/parse').parseString;
 
