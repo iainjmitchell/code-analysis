@@ -1,4 +1,5 @@
 const EOL = require('os').EOL;
+const HotspotToD3Json = require('../../src/transforms/hotspot-to-d3-json');
 
 const testCases = [
     { module: 'file1.js', revisions: 50, code: 1341 },
@@ -12,9 +13,9 @@ testCases.forEach((testCase) => {
         ].join(EOL);
     
         await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({
-            "name": ".",
-            "children": [
-                {"size": testCase.code, "name": testCase.module, "weight": 1}
+            name: 'root',
+            children: [
+                {size: testCase.code, name: testCase.module, weight: 1}
             ]
         });
     });
@@ -33,10 +34,10 @@ test('converted two root records with equal split of weight', async() => {
     ].join(EOL);
 
     await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({
-        "name": ".",
-        "children": [
-            {"size": records[0].code, "name": records[0].module, "weight": 0.5},
-            {"size": records[1].code, "name": records[1].module, "weight": 0.5}
+        name: 'root',
+        children: [
+            {size: records[0].code, name: records[0].module, weight: 0.5},
+            {size: records[1].code, name: records[1].module, weight: 0.5}
         ]
     });
 });
@@ -54,39 +55,55 @@ test('converted two root records with unequal split of weight', async() => {
     ].join(EOL);
 
     await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({
-        "name": ".",
-        "children": [
-            {"size": records[0].code, "name": records[0].module, "weight": 0.75},
-            {"size": records[1].code, "name": records[1].module, "weight": 0.25}
+        name: 'root',
+        children: [
+            {size: records[0].code, name: records[0].module, weight: 0.75},
+            {size: records[1].code, name: records[1].module, weight: 0.25}
         ]
     });
 });
 
-const parseString = require('@fast-csv/parse').parseString;
+test('one record within a folder', async() => {
+    const hotspotCSVData = [
+        'module,revisions,code',
+        'src/bob.js,30,123'
+    ].join(EOL);
 
-class HotspotToD3Json {
-    static async transform(hotspotCSVData) {
-        const csvData = await HotspotToD3Json._parseCSVData(hotspotCSVData);
-        const totalNumberOfRevisions = csvData.reduce((accumilator, csvRow) => accumilator + parseInt(csvRow.revisions), 0);
-        return {
-            "name": ".",
-            "children": csvData.map(csvRow => HotspotToD3Json._convertRow(csvRow, totalNumberOfRevisions))
-        };
-    }
+    await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({
+        name: 'root',
+        children: [{
+            name: 'src',
+            children: [
+                {size: 123, name: 'bob.js', weight: 1}
+            ]
+        }]
+    });
+});
 
-    static async _parseCSVData(hotspotCSVData){
-        const rows = [];
-        return new Promise((resolve, reject) => {
-            parseString(hotspotCSVData, { headers: true })
-                .on('data', row => rows.push(row))
-                .on('end', () => resolve(rows))
-                .on('error', reject);
-        });
-    }
+test('multiple records within and outside folders', async() => {
+    const hotspotCSVData = [
+        'module,revisions,code',
+        'src/bob.js,25,123',
+        'src/terry/one.js,25,12',
+        'package.json,50,12' 
+    ].join(EOL);
 
-    static _convertRow(csvDataRow, totalNumberOfRevisions){
-        const revisions = parseInt(csvDataRow.revisions);
-        const weight = (revisions / totalNumberOfRevisions);
-        return {"size": parseInt(csvDataRow.code), "name": csvDataRow.module, "weight": weight};
-    }
-}
+    await expect(HotspotToD3Json.transform(hotspotCSVData)).resolves.toEqual({
+        name: 'root',
+        children: [{
+                name: 'src',
+                children: [
+                    {size: 123, name: 'bob.js', weight: 0.25},
+                    {
+                        name: 'terry',
+                        children: [
+                            {size: 12, name: 'one.js', weight: 0.25}
+                        ]
+                    }
+                ]
+            },
+            {size: 12, name: 'package.json', weight: 0.50}
+        ]
+    });
+});
+
