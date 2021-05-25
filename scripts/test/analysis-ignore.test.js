@@ -2,30 +2,33 @@ const { execSync } = require("child_process");
 const fs = require('fs');
 const { EOL } = require('os');
 const WORKING_DIR = `${__dirname}/temp`;
+const ANALYSIS_IGNORE_FILE = `${WORKING_DIR}/.analysisignore`;
 
 beforeAll(() => {
     execSync(`rm -rf ${WORKING_DIR}`);
     execSync(`mkdir ${WORKING_DIR}`);
+    createAnalysisIgnoreFile();
 });
 
-test('Returns same Nothing matching in git log', () => {
+function createAnalysisIgnoreFile(){
     const analysisIgnore = [
         'bob.txt',
         'dave.json'
     ].join(EOL);
-    const analysisIgnoreFile = `${WORKING_DIR}/.analysisignore`;
-    fs.writeFileSync(analysisIgnoreFile, analysisIgnore);
+    fs.writeFileSync(ANALYSIS_IGNORE_FILE, analysisIgnore);
+}
 
+test('Returns same when nothing matches in git log', () => {
     const gitLog = [
         '--bf28da6--2021-05-24--bob',
         'dave.txt'
     ].join(EOL);
     const gitLogFile = `${WORKING_DIR}/gitlog.log`
-    const gitLogBefore = `${WORKING_DIR}/gitlog.before`
+    const gitLogExpected = `${WORKING_DIR}/gitlog.expected`
     fs.writeFileSync(gitLogFile, gitLog);
-    fs.writeFileSync(gitLogBefore, gitLog);
-    execSync(`${__dirname}/../analysis-ignore.sh ${analysisIgnoreFile} ${gitLogFile}`)
-    expect(() => execSync(`diff ${gitLogBefore} ${gitLogFile}`))
+    fs.writeFileSync(gitLogExpected, gitLog);
+    execSync(`${__dirname}/../analysis-ignore.sh ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
+    expect(() => execSync(`diff ${gitLogFile} ${gitLogExpected}`))
         .not.toThrow();
 });
 
