@@ -2,6 +2,7 @@
 CODE_DIR='code'
 GIT_LOG='git_log.log'
 CLOC_LOG='cloc_output.csv'
+CODE_DIR_FULL_PATH=$(pwd)/$CODE_DIR
 
 function start() {
     repository=$1
@@ -55,12 +56,14 @@ function generate_git_log(){
     cd $CODE_DIR 
     git log --all --numstat --date=short --pretty=format:'--%h--%ad--%aN' --no-renames > $GIT_LOG
     cd ..
+    ./scripts/analysis-ignore.sh $(pwd)/config/.analysisignore $CODE_DIR_FULL_PATH/$GIT_LOG
 }
 
 function count_lines_of_code() {
     docker run --rm -v $(pwd)/$CODE_DIR:/$CODE_DIR aldanial/cloc /$CODE_DIR --by-file --csv --report-file=/$CODE_DIR/$CLOC_LOG
     remove_code_directory_from_path='s/\/code\///g'
     sed -i '' $remove_code_directory_from_path ./$CODE_DIR/$CLOC_LOG
+    ./scripts/analysis-ignore.sh $(pwd)/config/.analysisignore $CODE_DIR_FULL_PATH/$CLOC_LOG
 }
 
 function start_server(){
