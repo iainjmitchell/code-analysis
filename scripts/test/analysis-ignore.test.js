@@ -21,13 +21,13 @@ function createAnalysisIgnoreFile(){
 test('Returns same when nothing matches in git log', () => {
     const gitLog = [
         '--bf28da6--2021-05-24--bob',
-        'dave.txt'
+        '1 23 dave.txt'
     ].join(EOL);
     const gitLogFile = `${WORKING_DIR}/gitlog.log`
     const gitLogExpectedFile = `${WORKING_DIR}/gitlog.expected`
     fs.writeFileSync(gitLogFile, gitLog);
     fs.writeFileSync(gitLogExpectedFile, gitLog);
-    execSync(`${__dirname}/../analysis-ignore.sh ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
+    execSync(`${__dirname}/../analysis-ignore ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
     expect(() => execSync(`diff -b ${gitLogFile} ${gitLogExpectedFile}`))
         .not.toThrow();
 });
@@ -35,7 +35,7 @@ test('Returns same when nothing matches in git log', () => {
 test('Removes one matching entry from git log', () => {
     const gitLog = [
         '--bf28da6--2021-05-24--bob',
-        'dave.json'
+        '12 dave.json'
     ].join(EOL);
     const gitLogFile = `${WORKING_DIR}/gitlog.log`
     const gitLogExpected = [
@@ -44,7 +44,7 @@ test('Removes one matching entry from git log', () => {
     const gitLogExpectedFile = `${WORKING_DIR}/gitlog.expected`
     fs.writeFileSync(gitLogFile, gitLog);
     fs.writeFileSync(gitLogExpectedFile, gitLogExpected);
-    execSync(`${__dirname}/../analysis-ignore.sh ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
+    execSync(`${__dirname}/../analysis-ignore ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
     expect(() => execSync(`diff -b ${gitLogFile} ${gitLogExpectedFile}`))
         .not.toThrow();
 });
@@ -52,8 +52,8 @@ test('Removes one matching entry from git log', () => {
 test('Removes multiple matching entry from git log', () => {
     const gitLog = [
         '--bf28da6--2021-05-24--bob',
-        'dave.json',
-        'bob.txt',
+        '17 10 dave.json',
+        '29 99 bob.txt',
     ].join(EOL);
     const gitLogFile = `${WORKING_DIR}/gitlog.log`
     const gitLogExpected = [
@@ -62,7 +62,24 @@ test('Removes multiple matching entry from git log', () => {
     const gitLogExpectedFile = `${WORKING_DIR}/gitlog.expected`
     fs.writeFileSync(gitLogFile, gitLog);
     fs.writeFileSync(gitLogExpectedFile, gitLogExpected);
-    execSync(`${__dirname}/../analysis-ignore.sh ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
+    execSync(`${__dirname}/../analysis-ignore ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
+    expect(() => execSync(`diff -b ${gitLogFile} ${gitLogExpectedFile}`))
+        .not.toThrow();
+});
+
+test('Does not remove file from commit message', () => {
+    const gitLog = [
+        '[d3ac32c] Olly 2021-05-13 add lib to gitignore, update dave.json',
+        '1 0 dave.json'
+    ].join(EOL);
+    const gitLogFile = `${WORKING_DIR}/gitlog.log`
+    const gitLogExpected = [
+        '[d3ac32c] Olly 2021-05-13 add lib to gitignore, update dave.json',
+    ].join(EOL);
+    const gitLogExpectedFile = `${WORKING_DIR}/gitlog.expected`
+    fs.writeFileSync(gitLogFile, gitLog);
+    fs.writeFileSync(gitLogExpectedFile, gitLogExpected);
+    execSync(`${__dirname}/../analysis-ignore ${ANALYSIS_IGNORE_FILE} ${gitLogFile}`)
     expect(() => execSync(`diff -b ${gitLogFile} ${gitLogExpectedFile}`))
         .not.toThrow();
 });

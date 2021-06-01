@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+
+const ANALYSIS_IGNORE_FILENAME = process.argv[2];
+const LOGFILE = process.argv[3];
+
+const ignore_files = readFileIntoArray(ANALYSIS_IGNORE_FILENAME);
+const logfile = readFileIntoArray(LOGFILE);
+const ignored_files = new RegExp(ignore_files.join('|'));
+const commit_message = new RegExp(/^\[\S*\]/);
+
+const result = logfile.filter((line) => {
+    return commit_message.test(line) || !ignored_files.test(line);
+});
+
+fs.writeFileSync(LOGFILE, result.join('\n'), 'UTF-8');
+
+function readFileIntoArray(filename) {
+    const fileData = fs.readFileSync(filename, 'UTF-8');
+    return fileData.split(/\r?\n/);
+}
