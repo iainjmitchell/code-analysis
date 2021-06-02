@@ -1,2 +1,9 @@
 package-lock.json
 package.json
+tsconfig.json
+.eslintrc
+.gitignore
+.prettierrc
+.editorconfig
+.eslintrc.js
+tsconfig.json

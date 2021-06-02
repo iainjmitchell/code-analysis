@@ -34,7 +34,7 @@ function analyse_code() {
     echo 'starting analysis'
     # churn_analysis
     # hotspots_analysis
-    soc_analysis
+    sum_of_coupling_analysis
 }
 
 function churn_analysis() {
@@ -53,7 +53,7 @@ function hotspots_analysis() {
     python ./scripts/merge_comp_freqs.py $CODE_DIR/$revisions_file $CODE_DIR/$CLOC_LOG | node ./scripts/transformHotspotsToD3.js > $codebaseFolder/data/hotspots.json
 }
 
-function soc_analysis() {
+function sum_of_coupling_analysis() {
     soc_git_log='soc-git.log'
     soc_file='soc.csv'
     cd $CODE_DIR
