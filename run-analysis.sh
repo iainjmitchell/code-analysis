@@ -84,7 +84,7 @@ function remove_ignored_files() {
 }
 
 function start_server(){
-    http-server -p 8090 $codebaseFolder
+    http-server -c-1 -p 8090 $codebaseFolder
 }
 
 start $1 $2

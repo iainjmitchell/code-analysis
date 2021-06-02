@@ -1,0 +1,10 @@
+filename,soc,lines
+src/commands/deploy.ts,24,297
+DOG2.md,24,62
+TODO.md,0,62
+src/commands/init.ts,7,62
+src/types.ts,16,19
+test/commands/hello.test.js,8,15
+bin/run.cmd,8,2
+one-web-hosting.json,17,1
+src/index.ts,9,1

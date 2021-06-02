@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "template-server": "http-server site-template",
+    "template-server": "http-server -c-1 site-template",
     "test": "jest ./scripts/test"
   },
   "repository": {

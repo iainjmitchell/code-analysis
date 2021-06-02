@@ -9,7 +9,7 @@ async function run(options){
     const clocOutput = await parseCSVData(options.clocfile);
     const clocWithoutSum = getClocWithoutSumRow(clocOutput);
     const combinedLines = clocWithoutSum.map((clocRow) => buildCombinedRow(clocRow, socOutput));
-    combinedLines.unshift('filename,lines,soc');
+    combinedLines.unshift('filename,soc,lines');
     writeFileSync(options.output, combinedLines.join(EOL), 'UTF8');
 }
 
@@ -25,7 +25,7 @@ function buildCombinedRow(clocRow, socOutput){
         return socEntry.entity === fileName;
     });
     const soc = matchingSocEntry ? matchingSocEntry.soc : 0;
-    return `${fileName},${clocRow.code},${soc}`;
+    return `${fileName},${soc},${clocRow.code}`;
 }
 
 async function parseCSVData(filename){

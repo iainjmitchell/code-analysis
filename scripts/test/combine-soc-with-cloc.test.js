@@ -30,9 +30,9 @@ test('Multiple matching files in both soc and cloc', () => {
     writeFileSync(clocFileName, clocFile);    
     
     const expectedCombinedFile = [
-        'filename,lines,soc',
-        'bob.txt,100,12',
-        'dave.txt,1000,100'
+        'filename,soc,lines',
+        'bob.txt,12,100',
+        'dave.txt,100,1000'
     ].join(EOL);
     writeFileSync(expectedCombinedFileName, expectedCombinedFile);  
 
@@ -56,8 +56,8 @@ test('soc contains items that are not in cloc log', () => {
     writeFileSync(clocFileName, clocFile);    
     
     const expectedCombinedFile = [
-        'filename,lines,soc',
-        'bob.txt,100,12'
+        'filename,soc,lines',
+        'bob.txt,12,100'
     ].join(EOL);
     writeFileSync(expectedCombinedFileName, expectedCombinedFile);  
 
@@ -81,9 +81,9 @@ test('cloc contains items that are not in soc log', () => {
     writeFileSync(clocFileName, clocFile);    
     
     const expectedCombinedFile = [
-        'filename,lines,soc',
-        'bob.txt,100,12',
-        'dave.txt,1000,0'
+        'filename,soc,lines',
+        'bob.txt,12,100',
+        'dave.txt,0,1000'
     ].join(EOL);
     writeFileSync(expectedCombinedFileName, expectedCombinedFile);  
 
@@ -107,8 +107,8 @@ test('ignore SUM in cloc file', () => {
     writeFileSync(clocFileName, clocFile);    
     
     const expectedCombinedFile = [
-        'filename,lines,soc',
-        'bob.txt,100,12'
+        'filename,soc,lines',
+        'bob.txt,12,100'
     ].join(EOL);
     writeFileSync(expectedCombinedFileName, expectedCombinedFile);  
 
