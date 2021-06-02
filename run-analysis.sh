@@ -14,7 +14,7 @@ function start() {
     generate_git_log
     count_lines_of_code
     analyse_code 
-    # start_server
+    start_server
 }
 
 function get_code() {
@@ -32,8 +32,8 @@ function create_analysis_site() {
 
 function analyse_code() {
     echo 'starting analysis'
-    # churn_analysis
-    # hotspots_analysis
+    churn_analysis
+    hotspots_analysis
     sum_of_coupling_analysis
 }
 
@@ -61,6 +61,7 @@ function sum_of_coupling_analysis() {
     cd ..
     remove_ignored_files $CODE_DIR_FULL_PATH/$soc_git_log
     docker container run -v $(pwd)/$CODE_DIR:/$CODE_DIR --rm philipssoftware/code-maat -l /$CODE_DIR/$soc_git_log -c git -a soc > ./$CODE_DIR/$soc_file
+    ./scripts/combine-soc-with-cloc --socfile $CODE_DIR_FULL_PATH/$soc_file --clocfile $CODE_DIR_FULL_PATH/$CLOC_LOG --output $codebaseFolder/data/soc.csv
 }
 
 function generate_git_log(){

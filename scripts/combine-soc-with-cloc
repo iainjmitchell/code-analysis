@@ -7,15 +7,25 @@ const parseCsvFile = require('@fast-csv/parse').parseFile;
 async function run(options){
     const socOutput = await parseCSVData(options.socfile); 
     const clocOutput = await parseCSVData(options.clocfile);
-    const combinedLines = clocOutput.map((cloc) => {
-        const fileName = cloc.filename;
-        const matchingSocEntry = socOutput.find((socEntry) => {
-            return socEntry.entity === fileName;
-        });
-        return `${fileName},${cloc.code},${matchingSocEntry.soc}`;
-    });
+    const clocWithoutSum = getClocWithoutSumRow(clocOutput);
+    const combinedLines = clocWithoutSum.map((clocRow) => buildCombinedRow(clocRow, socOutput));
     combinedLines.unshift('filename,lines,soc');
     writeFileSync(options.output, combinedLines.join(EOL), 'UTF8');
+}
+
+function getClocWithoutSumRow(clocOutput){
+    return clocOutput.filter((cloc) => {
+        return cloc.language !== 'SUM'
+    });
+}
+
+function buildCombinedRow(clocRow, socOutput){
+    const fileName = clocRow.filename;
+    const matchingSocEntry = socOutput.find((socEntry) => {
+        return socEntry.entity === fileName;
+    });
+    const soc = matchingSocEntry ? matchingSocEntry.soc : 0;
+    return `${fileName},${clocRow.code},${soc}`;
 }
 
 async function parseCSVData(filename){
